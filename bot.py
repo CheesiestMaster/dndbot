@@ -115,8 +115,16 @@ async def quests(ctx, query):
 		out+=f"{i}\n"
 	if len(out)>1500:
 		tmp=[]
-		for i in range((len(out)//1500)+1):
-			tmp.append(out[i*1500:(i+1)*1500])
+		for i in range((len(out)//1500)):
+			l=out.split('\n')
+			l=l[:-2]
+			for row in l:
+				if tmp==[]:
+					tmp.append(row+'\n')
+				elif len(tmp[-1])>1500:
+					tmp.append(row+'\n')
+				else:
+					tmp[-1]+=(row+'\n')
 		await ctx.send(f"{ctx.author}:")
 		for i in tmp:
 			await ctx.send(f"{dsf.mcb}\n{i.lstrip(dsf.mcb).rstrip(dsf.mcb)}{dsf.mcb}")
