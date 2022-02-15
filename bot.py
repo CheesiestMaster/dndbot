@@ -1,15 +1,13 @@
 #!/usr/bin/python3
 import discord
 from discord.ext import commands
-import discordauth as dauth
-import sqlauth as sauth
 import time
-import botsettings
 import subprocess as sp
 import dsformat as dsf
+import botconfig as conf
 intents=discord.Intents.default()
 intents.members=True
-bot=commands.Bot(command_prefix=botsettings.prefix,owner_id=botsettings.owner,intents=intents)
+bot=commands.Bot(command_prefix=conf.prefix,owner_id=conf.owner,intents=intents)
 activities=["Awaiting Input","Processing","Querying Database","Error"]
 activity=0
 starttime=0
@@ -44,14 +42,14 @@ def convtable(list):
 
 def mysql(query,callerid):
 	flag=0
-	auth=sp.run(["mysql",f'-p{sauth.pwd}',f'-h{sauth.server}','-Dbots',f'-eSELECT questperms FROM dndperms WHERE userid={callerid}'], capture_output=True)
+	auth=sp.run(["mysql",f'-p{conf.pwd}',f'-h{conf.server}',f'-D{authdb}',f'-eSELECT questperms FROM {authtab} WHERE userid={callerid}'], capture_output=True)
 	auth=auth.stdout
 	auth=auth.split(b"\n")
 	auth=auth[1].decode()
 	auth=auth.split(',')
 	if query=="-1":
 		if '-1' in auth:
-			result=sp.run(["mysql",f'-p{sauth.pwd}',f'-h{sauth.server}','-DDnD',f'-eSELECT q.questid, q.questname, q.questgiver, c.charname, q.queststatus from quests q join characters c on q.assignedcharid = c.charid'], capture_output=True)
+			result=sp.run(["mysql",f'-p{conf.pwd}',f'-h{conf.server}',f'-D{questdb}',f'-eSELECT q.questid, q.questname, q.questgiver, c.charname, q.queststatus from quests q join characters c on q.assignedcharid = c.charid'], capture_output=True)
 		else:
 			return("You are not authorized to request all quests")
 			flag=1
@@ -61,7 +59,7 @@ def mysql(query,callerid):
 			if i in auth or '-1' in auth:
 				req+=i+','
 		req=req[:-1]
-		result=sp.run(["mysql",f'-p{sauth.pwd}',f'-h{sauth.server}','-DDnD',f'-eSELECT q.questid, q.questname, q.questgiver, c.charname, q.queststatus from quests q join characters c on q.assignedcharid = c.charid WHERE c.charid in ({req})'], capture_output=True)
+		result=sp.run(["mysql",f'-p{conf.pwd}',f'-h{conf.server}',f'-D{questdb}',f'-eSELECT q.questid, q.questname, q.questgiver, c.charname, q.queststatus from quests q join characters c on q.assignedcharid = c.charid WHERE c.charid in ({req})'], capture_output=True)
 	result=result.stdout
 	result=result.split(b"\n")
 	for i in range(len(result)):
@@ -82,7 +80,7 @@ async def on_ready():
 	print(f"Logged in as {bot.user} (ID: {bot.user.id})")
 	starttime=int(time.time())
 	print(f"started at: {time.ctime(starttime)} ({starttime})")
-	print(f"Owner: {bot.get_user(botsettings.owner)}")
+	print(f"Owner: {bot.get_user(conf.owner)}")
 	guilds=bot.guilds
 	for i in guilds:
 		channels.append(i.channels)
@@ -98,7 +96,7 @@ async def ping(ctx):
 
 @bot.command()
 async def kill(ctx):
-	if ctx.author.id==botsettings.owner:
+	if ctx.author.id==conf.owner:
 		print("user is owner")
 		await ctx.send(f"{ctx.author} Is restarting the bot, Please wait")
 		await bot.change_presence(activity=discord.Game("REBOOTING"))
@@ -132,4 +130,4 @@ async def quests(ctx, query):
 		await ctx.send(f"{ctx.author}: \n{out}")
 
 # Run bot with hidden Token
-bot.run(dauth.token)
+bot.run(conf.token)

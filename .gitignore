@@ -1,4 +1,5 @@
 sqlauth.py
 discordauth.py
 botsettings.py
+botconfig.py
 __pycache__
