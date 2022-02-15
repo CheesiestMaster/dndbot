@@ -28,9 +28,9 @@ def convtable(list):
                 colsize[i]=len(row[i])
     for row in list:
         for i in range(len(row)):
-            tmp=row[i]+pad+pad
+            tmp=row[i]+pad[:colsize[i]]
             row[i]=f"{tmp[:colsize[i]]}"
-    tmp=pad.replace(" ","-")+pad.replace(" ","-")
+    tmp=pad.replace(" ","-")
     out=[dsf.mcb,f"+{tmp[:colsize[0]+2]}+{tmp[:colsize[3]+2]}+{tmp[:colsize[1]+2]}+{tmp[:colsize[2]+2]}+{tmp[:colsize[4]+2]}+"]
     out.append(f'| {list[0][0]} | {list[0][3]} | {list[0][1]} | {list[0][2]} | {list[0][4]} |')
     out.append(out[1])
