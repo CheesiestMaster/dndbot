@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # Import pycord Library
 import discord
 from discord.ext import commands
@@ -95,7 +95,7 @@ def mysql(query,callerid):
 	# Remove extra item from table
 	result.pop()
 	if result==[]:
-		out=[f"No Quests for ID: {query}"]
+		out=[f"No Visible Quests for ID: {query}"]
 	elif flag==0:
 		out=convtable(result)
 	else:
@@ -110,6 +110,7 @@ async def on_ready():
 	starttime=int(time.time())
 	print(f"started at: {time.ctime(starttime)} ({starttime})")
 	print(f"Owner: {bot.get_user(conf.owner)}")
+	# Set empty globals
 	guilds=bot.guilds
 	for i in guilds:
 		channels.append(i.channels)
